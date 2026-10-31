@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4">
+    <h3>{{ 'Editar' if contato else 'Adicionar' }} Contato - {{ empresa.nome_razao_social }}</h3>
+    <form method="POST" class="mt-3">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Nome *</label>
+                <input type="text" name="nome" class="form-control" required value="{{ contato.nome if contato else '' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">WhatsApp *</label>
+                <input type="text" name="whatsapp" class="form-control" placeholder="13991905058" required value="{{ contato.whatsapp if contato else '' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Função *</label>
+                <select name="funcao" class="form-select" required>
+                    <option value="Dono" {% if contato and contato.funcao == 'Dono' %}selected{% endif %}>Dono</option>
+                    <option value="Operador" {% if contato and contato.funcao == 'Operador' %}selected{% endif %}>Operador</option>
+                    <option value="Contador" {% if contato and contato.funcao == 'Contador' %}selected{% endif %}>Contador</option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Recebe Arquivo Fiscal (XMLs/Boletos)?</label>
+                <select name="recebe_arquivo_fiscal" class="form-select">
+                    <option value="Não" {% if contato and not contato.recebe_arquivo_fiscal %}selected{% endif %}>Não</option>
+                    <option value="Sim" {% if contato and contato.recebe_arquivo_fiscal %}selected{% endif %}>Sim</option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Observações</label>
+                <textarea name="observacoes" class="form-control" rows="2">{{ contato.observacoes if contato else '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Salvar Contato</button>
+            <a href="{{ url_for('empresas.detalhes', id=empresa.id) }}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

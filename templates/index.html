@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> Painel Operacional BananaTech</h2>
+    <div>
+        <a href="{{ url_for('tickets.criar') }}" class="btn btn-warning"><i class="bi bi-plus-circle"></i> Novo Ticket</a>
+        <a href="{{ url_for('empresas.criar') }}" class="btn btn-primary"><i class="bi bi-building-add"></i> Nova Empresa</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white p-3">
+            <h5>Total Empresas</h5>
+            <h3>{{ total_empresas }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white p-3">
+            <h5>Inadimplentes</h5>
+            <h3>{{ empresas_inadimplentes }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark p-3">
+            <h5>Tickets Abertos/Pendentes</h5>
+            <h3>{{ tickets_abertos }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white p-3">
+            <h5>Base de Conhecimento</h5>
+            <h3>{{ total_procedimentos }} artigos</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h5 class="card-title text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Avisos Críticos em Empresas</h5>
+            {% if empresas_alertas %}
+                <ul class="list-group list-group-flush">
+                    {% for emp in empresas_alertas %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('empresas.detalhes', id=emp.id) }}" class="fw-bold text-decoration-none">{{ emp.nome_razao_social }}</a>: 
+                            <span class="text-danger">{{ emp.avisos_criticos }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">Nenhum aviso crítico pendente.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h5 class="card-title"><i class="bi bi-clock-history"></i> ÚLtimos Atendimentos</h5>
+            {% if ultimos_tickets %}
+                <div class="list-group">
+                    {% for ticket in ultimos_tickets %}
+                        <a href="{{ url_for('tickets.detalhes', id=ticket.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ ticket.empresa.nome_razao_social }} ({{ ticket.categoria }})</h6>
+                                <small>{{ ticket.data_hora.strftime('%d/%m %H:%M') }}</small>
+                            </div>
+                            <p class="mb-1 text-truncate">{{ ticket.descricao }}</p>
+                            <span class="badge bg-{{ 'success' if ticket.status == 'Resolvido' else ('danger' if ticket.status == 'Aberto' else 'warning') }}">{{ ticket.status }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Nenhum ticket registrado até o momento.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

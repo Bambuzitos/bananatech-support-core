@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-hdd-network"></i> Módulo de Backup & Restauração</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card p-4 h-100 border-primary">
+            <h4 class="card-title text-primary"><i class="bi bi-download"></i> Exportar Backup Completo</h4>
+            <p>Gera e baixa um arquivo <code>.zip</code> contendo o banco de dados completo (<code>bananatech.db</code>) e a pasta de anexos (prints, manuais e logs).</p>
+            <div class="mt-auto">
+                <a href="{{ url_for('backup.exportar') }}" class="btn btn-primary btn-lg w-100"><i class="bi bi-file-earmark-zip"></i> Baixar Arquivo .ZIP de Backup</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-4 h-100 border-danger">
+            <h4 class="card-title text-danger"><i class="bi bi-upload"></i> Restaurar Backup Completo</h4>
+            <p class="text-danger fw-bold"><i class="bi bi-exclamation-triangle"></i> Atenção: A restauração irá sobrescrever o banco de dados e arquivos atuais pelo conteúdo do arquivo de backup enviado.</p>
+            <form action="{{ url_for('backup.restaurar') }}" method="POST" enctype="multipart/form-data" class="mt-auto">
+                <div class="mb-3">
+                    <label class="form-label">Selecione o arquivo backup_bananatech.zip</label>
+                    <input type="file" name="backup_zip" class="form-control" accept=".zip" required>
+                </div>
+                <button type="submit" class="btn btn-danger btn-lg w-100" onclick="return confirm('Confirma a restauração do backup? Os dados atuais serão substituídos.');">
+                    <i class="bi bi-arrow-counterclockwise"></i> Restaurar Estado Completo
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

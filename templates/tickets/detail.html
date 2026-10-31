@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Ticket #{{ ticket.id }} - {{ ticket.empresa.nome_razao_social }}</h2>
+    <div>
+        <a href="{{ url_for('tickets.editar', id=ticket.id) }}" class="btn btn-warning"><i class="bi bi-pencil"></i> Editar Ticket</a>
+        <form action="{{ url_for('tickets.deletar', id=ticket.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Excluir ticket?');">
+            <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+        </form>
+    </div>
+</div>
+
+<div class="card p-4 mb-4">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <strong>Data/Hora:</strong><br>{{ ticket.data_hora.strftime('%d/%m/%Y %H:%M') }}
+        </div>
+        <div class="col-md-3">
+            <strong>Status:</strong><br>
+            <span class="badge bg-{{ 'success' if ticket.status == 'Resolvido' else ('danger' if ticket.status == 'Aberto' else 'warning') }}">{{ ticket.status }}</span>
+        </div>
+        <div class="col-md-3">
+            <strong>Canal:</strong><br><span class="badge bg-light text-dark">{{ ticket.canal }}</span>
+        </div>
+        <div class="col-md-3">
+            <strong>Categoria:</strong><br><span class="badge bg-info text-dark">{{ ticket.categoria }}</span>
+        </div>
+
+        <hr>
+
+        <div class="col-md-6">
+            <strong>Empresa:</strong> <a href="{{ url_for('empresas.detalhes', id=ticket.empresa.id) }}">{{ ticket.empresa.nome_razao_social }}</a><br>
+            <strong>Sistema:</strong> {{ ticket.empresa.sistema_principal }}
+        </div>
+        <div class="col-md-6">
+            <strong>Contato Solicitante:</strong> {{ ticket.contato.nome if ticket.contato else 'Geral' }} 
+            {% if ticket.contato %}({{ ticket.contato.whatsapp }}){% endif %}
+        </div>
+
+        <hr>
+
+        <div class="col-md-12">
+            <h5>Descrição do Problema</h5>
+            <p class="p-3 bg-light rounded">{{ ticket.descricao }}</p>
+        </div>
+
+        <div class="col-md-12">
+            <h5>Solução Aplicada</h5>
+            <p class="p-3 bg-light rounded">{{ ticket.solucao_aplicada or 'Nenhuma solução registrada ainda.' }}</p>
+        </div>
+
+        {% if ticket.procedimento %}
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <strong><i class="bi bi-book"></i> Procedimento Vinculado da Base de Conhecimento:</strong> 
+                <a href="{{ url_for('procedimentos.detalhes', id=ticket.procedimento.id) }}" target="_blank" class="fw-bold">{{ ticket.procedimento.titulo }}</a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if ticket.anexo_path %}
+        <div class="col-md-12">
+            <strong>Anexo (Print/Log):</strong><br>
+            <a href="{{ url_for('uploaded_file', filename=ticket.anexo_path) }}" target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                <i class="bi bi-paperclip"></i> Visualizar Arquivo Anexo
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

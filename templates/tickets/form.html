@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4">
+    <h3>{{ 'Editar' if ticket else 'Novo' }} Ticket de Atendimento</h3>
+    <form method="POST" enctype="multipart/form-data" class="mt-3">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Empresa *</label>
+                <select name="empresa_id" class="form-select" required>
+                    <option value="">Selecione uma Empresa...</option>
+                    {% for emp in empresas %}
+                        <option value="{{ emp.id }}" {% if (ticket and ticket.empresa_id == emp.id) or (empresa_pre_selected == emp.id) %}selected{% endif %}>
+                            {{ emp.nome_razao_social }} ({{ emp.sistema_principal }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Canal de Atendimento *</label>
+                <select name="canal" class="form-select" required>
+                    <option value="WhatsApp" {% if ticket and ticket.canal == 'WhatsApp' %}selected{% endif %}>WhatsApp</option>
+                    <option value="Telefone" {% if ticket and ticket.canal == 'Telefone' %}selected{% endif %}>Telefone</option>
+                    <option value="Presencial" {% if ticket and ticket.canal == 'Presencial' %}selected{% endif %}>Presencial</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status *</label>
+                <select name="status" class="form-select" required>
+                    <option value="Aberto" {% if ticket and ticket.status == 'Aberto' %}selected{% endif %}>Aberto</option>
+                    <option value="Pendente" {% if ticket and ticket.status == 'Pendente' %}selected{% endif %}>Pendente</option>
+                    <option value="Resolvido" {% if ticket and ticket.status == 'Resolvido' %}selected{% endif %}>Resolvido</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Contato Solicitante</label>
+                <select name="contato_id" class="form-select">
+                    <option value="">Nenhum / Geral</option>
+                    {% for cont in contatos %}
+                        <option value="{{ cont.id }}" {% if ticket and ticket.contato_id == cont.id %}selected{% endif %}>
+                            {{ cont.nome }} ({{ cont.funcao }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Categoria do Problema *</label>
+                <select name="categoria" class="form-select" required>
+                    <option value="Erro TK2000" {% if ticket and ticket.categoria == 'Erro TK2000' %}selected{% endif %}>Erro TK2000</option>
+                    <option value="Rejeição Sefaz" {% if ticket and ticket.categoria == 'Rejeição Sefaz' %}selected{% endif %}>Rejeição Sefaz</option>
+                    <option value="Hardware" {% if ticket and ticket.categoria == 'Hardware' %}selected{% endif %}>Hardware</option>
+                    <option value="Dúvida Fiscal" {% if ticket and ticket.categoria == 'Dúvida Fiscal' %}selected{% endif %}>Dúvida Fiscal</option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Procedimento Relacionado (Base de Conhecimento)</label>
+                <select name="procedimento_id" class="form-select">
+                    <option value="">Nenhum procedimento vinculado</option>
+                    {% for proc in procedimentos %}
+                        <option value="{{ proc.id }}" {% if ticket and ticket.procedimento_id == proc.id %}selected{% endif %}>
+                            [{{ proc.sistema_relacionado }}] {{ proc.titulo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Descrição do Erro / Solicitação *</label>
+                <textarea name="descricao" class="form-control" rows="3" required>{{ ticket.descricao if ticket else '' }}</textarea>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Solução Aplicada</label>
+                <textarea name="solucao_aplicada" class="form-control" rows="3">{{ ticket.solucao_aplicada if ticket else '' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Anexo de Print ou Log de Erro</label>
+                <input type="file" name="anexo_file" class="form-control">
+                {% if ticket and ticket.anexo_path %}
+                    <small class="text-muted">Anexo atual: <a href="{{ url_for('uploaded_file', filename=ticket.anexo_path) }}" target="_blank">Ver Print/Log</a></small>
+                {% endif %}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Observações Internas</label>
+                <input type="text" name="observacoes" class="form-control" value="{{ ticket.observacoes if ticket else '' }}">
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Salvar Ticket</button>
+            <a href="{{ url_for('tickets.listar') }}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

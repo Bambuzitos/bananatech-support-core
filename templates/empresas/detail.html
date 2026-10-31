@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ empresa.nome_razao_social }}</h2>
+    <div>
+        <a href="{{ url_for('empresas.editar', id=empresa.id) }}" class="btn btn-warning"><i class="bi bi-pencil"></i> Editar Empresa</a>
+        <a href="{{ url_for('tickets.criar') }}?empresa_id={{ empresa.id }}" class="btn btn-primary"><i class="bi bi-headset"></i> Abrir Ticket</a>
+        <form action="{{ url_for('empresas.deletar', id=empresa.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja deletar esta empresa e todos os registros vinculados?');">
+            <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+        </form>
+    </div>
+</div>
+
+{% if empresa.avisos_criticos %}
+<div class="alert alert-critico p-3 mb-4 rounded">
+    <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> ALERTA CRÍTICO DE OPERAÇÃO</h5>
+    <p class="mb-0 fs-5 fw-bold">{{ empresa.avisos_criticos }}</p>
+</div>
+{% endif %}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <h5 class="card-title text-primary"><i class="bi bi-info-circle"></i> Dados Cadastrais e Financeiros</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>CNPJ:</strong> {{ empresa.cnpj }}</li>
+                <li class="list-group-item"><strong>Status:</strong> <span class="badge bg-{{ 'success' if empresa.status == 'Ativo' else ('danger' if empresa.status == 'Inadimplente' else 'secondary') }}">{{ empresa.status }}</span></li>
+                <li class="list-group-item"><strong>Endereço:</strong> {{ empresa.endereco or 'Não informado' }}</li>
+                <li class="list-group-item"><strong>Sistema Principal:</strong> <span class="badge bg-dark">{{ empresa.sistema_principal }}</span></li>
+                <li class="list-group-item"><strong>Banco:</strong> {{ empresa.banco or '-' }}</li>
+                <li class="list-group-item"><strong>Enviar Boleto Manualmente:</strong> {{ 'Sim' if empresa.enviar_boleto_manual else 'Não' }}</li>
+                <li class="list-group-item"><strong>Dia Vencimento Boleto:</strong> {{ empresa.dia_vencimento_boleto or '-' }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <h5 class="card-title text-primary"><i class="bi bi-file-earmark-text"></i> Rotina Fiscal e Certificado</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Dia Fechamento Fiscal:</strong> Dia {{ empresa.dia_fechamento_fiscal or '-' }}</li>
+                <li class="list-group-item"><strong>Compra Certificado Conosco:</strong> {{ 'Sim' if empresa.compra_certificado_conosco else 'Não' }}</li>
+                <li class="list-group-item"><strong>Vencimento Certificado:</strong> {{ empresa.vencimento_certificado.strftime('%d/%m/%Y') if empresa.vencimento_certificado else 'Não cadastrado' }}</li>
+                <li class="list-group-item"><strong>Observações:</strong> {{ empresa.observacoes or 'Nenhuma observação informada.' }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5><i class="bi bi-people"></i> Contatos da Empresa</h5>
+        <a href="{{ url_for('contatos.criar', empresa_id=empresa.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus"></i> Adicionar Contato</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>WhatsApp</th>
+                    <th>Função</th>
+                    <th>Recebe Arq. Fiscal?</th>
+                    <th>Observações</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contato in empresa.contatos %}
+                <tr>
+                    <td>{{ contato.nome }}</td>
+                    <td>
+                        <a href="https://wa.me/55{{ contato.whatsapp|replace(' ', '')|replace('-', '') }}" target="_blank" class="btn btn-sm btn-success">
+                            <i class="bi bi-whatsapp"></i> {{ contato.whatsapp }}
+                        </a>
+                    </td>
+                    <td><span class="badge bg-secondary">{{ contato.funcao }}</span></td>
+                    <td><span class="badge bg-{{ 'success' if contato.recebe_arquivo_fiscal else 'light text-dark' }}">{{ 'Sim' if contato.recebe_arquivo_fiscal else 'Não' }}</span></td>
+                    <td>{{ contato.observacoes or '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('contatos.editar', id=contato.id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                        <form action="{{ url_for('contatos.deletar', id=contato.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Remover contato?');">
+                            <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-muted">Nenhum contato cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card p-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5><i class="bi bi-pc-display"></i> Equipamentos e Acessos Remotos</h5>
+        <a href="{{ url_for('equipamentos.criar', empresa_id=empresa.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus"></i> Adicionar Equipamento</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Identificação</th>
+                    <th>Acesso Remoto (AnyDesk/TV)</th>
+                    <th>Drivers / Anexo</th>
+                    <th>Observações Técnicas</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for eq in empresa.equipamentos %}
+                <tr>
+                    <td><span class="badge bg-info text-dark">{{ eq.tipo }}</span></td>
+                    <td><strong>{{ eq.identificacao }}</strong></td>
+                    <td>
+                        ID: <code>{{ eq.acesso_remoto_id or 'N/A' }}</code><br>
+                        Senha: <code>{{ eq.acesso_remoto_senha or 'N/A' }}</code>
+                    </td>
+                    <td>
+                        {% if eq.url_drivers %}<a href="{{ eq.url_drivers }}" target="_blank" class="btn btn-sm btn-outline-secondary mb-1"><i class="bi bi-link"></i> Drivers</a>{% endif %}
+                        {% if eq.anexo_path %}<a href="{{ url_for('uploaded_file', filename=eq.anexo_path) }}" target="_blank" class="btn btn-sm btn-outline-info mb-1"><i class="bi bi-file-earmark"></i> Anexo</a>{% endif %}
+                    </td>
+                    <td>{{ eq.observacoes_tecnicas or '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('equipamentos.editar', id=eq.id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                        <form action="{{ url_for('equipamentos.deletar', id=eq.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Remover equipamento?');">
+                            <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-muted">Nenhum equipamento cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card p-3">
+    <h5><i class="bi bi-headset"></i> Histórico de Atendimentos / Tickets</h5>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Canal</th>
+                    <th>Categoria</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in empresa.tickets %}
+                <tr>
+                    <td>{{ ticket.data_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>{{ ticket.canal }}</td>
+                    <td><span class="badge bg-secondary">{{ ticket.categoria }}</span></td>
+                    <td>{{ ticket.descricao|truncate(60) }}</td>
+                    <td><span class="badge bg-{{ 'success' if ticket.status == 'Resolvido' else ('danger' if ticket.status == 'Aberto' else 'warning') }}">{{ ticket.status }}</span></td>
+                    <td><a href="{{ url_for('tickets.detalhes', id=ticket.id) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i> Detalhes</a></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-muted">Nenhum ticket registrado para esta empresa.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

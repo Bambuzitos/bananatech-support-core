@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4">
+    <h3 class="mb-4">{{ 'Editar' if empresa else 'Cadastrar' }} Empresa</h3>
+    <form method="POST">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Nome / Razão Social *</label>
+                <input type="text" name="nome_razao_social" class="form-control" required value="{{ empresa.nome_razao_social if empresa else '' }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">CNPJ *</label>
+                <input type="text" name="cnpj" class="form-control" required value="{{ empresa.cnpj if empresa else '' }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status *</label>
+                <select name="status" class="form-select" required>
+                    <option value="Ativo" {% if empresa and empresa.status == 'Ativo' %}selected{% endif %}>Ativo</option>
+                    <option value="Inativo" {% if empresa and empresa.status == 'Inativo' %}selected{% endif %}>Inativo</option>
+                    <option value="Inadimplente" {% if empresa and empresa.status == 'Inadimplente' %}selected{% endif %}>Inadimplente</option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Endereço Completo</label>
+                <input type="text" name="endereco" class="form-control" value="{{ empresa.endereco if empresa else '' }}">
+            </div>
+
+            <hr class="my-3">
+            <h5 class="text-muted">Sistema & Financeiro</h5>
+
+            <div class="col-md-3">
+                <label class="form-label">Sistema Principal *</label>
+                <select name="sistema_principal" class="form-select" required>
+                    <option value="TK2000" {% if empresa and empresa.sistema_principal == 'TK2000' %}selected{% endif %}>TK2000</option>
+                    <option value="Pallas" {% if empresa and empresa.sistema_principal == 'Pallas' %}selected{% endif %}>Pallas</option>
+                    <option value="GenPack" {% if empresa and empresa.sistema_principal == 'GenPack' %}selected{% endif %}>GenPack</option>
+                    <option value="ControlID" {% if empresa and empresa.sistema_principal == 'ControlID' %}selected{% endif %}>ControlID</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Banco</label>
+                <input type="text" name="banco" class="form-control" value="{{ empresa.banco if empresa else '' }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Enviar Boleto Manualmente?</label>
+                <select name="enviar_boleto_manual" class="form-select">
+                    <option value="Não" {% if empresa and not empresa.enviar_boleto_manual %}selected{% endif %}>Não</option>
+                    <option value="Sim" {% if empresa and empresa.enviar_boleto_manual %}selected{% endif %}>Sim</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Dia Vencimento Boleto</label>
+                <input type="number" min="1" max="31" name="dia_vencimento_boleto" class="form-control" value="{{ empresa.dia_vencimento_boleto if empresa else '' }}">
+            </div>
+
+            <hr class="my-3">
+            <h5 class="text-muted">Fiscal & Serviços</h5>
+
+            <div class="col-md-4">
+                <label class="form-label">Dia Fechamento Fiscal</label>
+                <input type="number" min="1" max="31" name="dia_fechamento_fiscal" class="form-control" value="{{ empresa.dia_fechamento_fiscal if empresa else '' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Compra Certificado Conosco?</label>
+                <select name="compra_certificado_conosco" class="form-select">
+                    <option value="Não" {% if empresa and not empresa.compra_certificado_conosco %}selected{% endif %}>Não</option>
+                    <option value="Sim" {% if empresa and empresa.compra_certificado_conosco %}selected{% endif %}>Sim</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Vencimento do Certificado</label>
+                <input type="date" name="vencimento_certificado" class="form-control" value="{{ empresa.vencimento_certificado.strftime('%Y-%m-%d') if empresa and empresa.vencimento_certificado else '' }}">
+            </div>
+
+            <hr class="my-3">
+            <h5 class="text-muted">Avisos & Observações</h5>
+
+            <div class="col-md-12">
+                <label class="form-label text-danger fw-bold">Avisos Críticos (Alerta Visual Destacado)</label>
+                <input type="text" name="avisos_criticos" class="form-control border-danger" placeholder="Ex: Cliente não enviar XML sem confirmar boletos pagos" value="{{ empresa.avisos_criticos if empresa else '' }}">
+            </div>
+            <div class="col-md-12">
+                <label class="form-label">Observações Gerais</label>
+                <textarea name="observacoes" class="form-control" rows="3">{{ empresa.observacoes if empresa else '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Salvar Empresa</button>
+            <a href="{{ url_for('empresas.listar') }}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

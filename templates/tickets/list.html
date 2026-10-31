@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Atendimentos / Tickets</h2>
+    <a href="{{ url_for('tickets.criar') }}" class="btn btn-warning"><i class="bi bi-plus-circle"></i> Novo Ticket</a>
+</div>
+
+<form method="GET" class="row g-2 mb-4">
+    <div class="col-md-4">
+        <select name="empresa_id" class="form-select">
+            <option value="">Todas as Empresas</option>
+            {% for emp in empresas %}
+                <option value="{{ emp.id }}" {% if empresa_id == emp.id|string %}selected{% endif %}>{{ emp.nome_razao_social }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="categoria" class="form-select">
+            <option value="">Todas as Categorias</option>
+            <option value="Erro TK2000" {% if categoria_filter == 'Erro TK2000' %}selected{% endif %}>Erro TK2000</option>
+            <option value="Rejeição Sefaz" {% if categoria_filter == 'Rejeição Sefaz' %}selected{% endif %}>Rejeição Sefaz</option>
+            <option value="Hardware" {% if categoria_filter == 'Hardware' %}selected{% endif %}>Hardware</option>
+            <option value="Dúvida Fiscal" {% if categoria_filter == 'Dúvida Fiscal' %}selected{% endif %}>Dúvida Fiscal</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="status" class="form-select">
+            <option value="">Todos os Status</option>
+            <option value="Aberto" {% if status_filter == 'Aberto' %}selected{% endif %}>Aberto</option>
+            <option value="Pendente" {% if status_filter == 'Pendente' %}selected{% endif %}>Pendente</option>
+            <option value="Resolvido" {% if status_filter == 'Resolvido' %}selected{% endif %}>Resolvido</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-secondary w-100"><i class="bi bi-search"></i> Filtrar</button>
+    </div>
+</form>
+
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Data</th>
+                    <th>Empresa / Contato</th>
+                    <th>Canal / Categoria</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tickets %}
+                <tr>
+                    <td>{{ t.data_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <a href="{{ url_for('empresas.detalhes', id=t.empresa.id) }}" class="fw-bold text-decoration-none">{{ t.empresa.nome_razao_social }}</a><br>
+                        <small class="text-muted">{{ t.contato.nome if t.contato else 'Contato Geral' }}</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">{{ t.canal }}</span><br>
+                        <span class="badge bg-info text-dark">{{ t.categoria }}</span>
+                    </td>
+                    <td>{{ t.descricao|truncate(80) }}</td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if t.status == 'Resolvido' else ('danger' if t.status == 'Aberto' else 'warning') }}">
+                            {{ t.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('tickets.detalhes', id=t.id) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i></a>
+                        <a href="{{ url_for('tickets.editar', id=t.id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-muted">Nenhum ticket encontrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

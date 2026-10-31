@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Empresas (Clientes)</h2>
+    <a href="{{ url_for('empresas.criar') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Cadastrar Empresa</a>
+</div>
+
+<form method="GET" class="row g-2 mb-4">
+    <div class="col-md-6">
+        <input type="text" name="q" class="form-control" placeholder="Buscar por Razão Social ou CNPJ..." value="{{ busca }}">
+    </div>
+    <div class="col-md-4">
+        <select name="status" class="form-select">
+            <option value="">Todos os Status</option>
+            <option value="Ativo" {% if status_filter == 'Ativo' %}selected{% endif %}>Ativo</option>
+            <option value="Inativo" {% if status_filter == 'Inativo' %}selected{% endif %}>Inativo</option>
+            <option value="Inadimplente" {% if status_filter == 'Inadimplente' %}selected{% endif %}>Inadimplente</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-secondary w-100"><i class="bi bi-search"></i> Filtrar</button>
+    </div>
+</form>
+
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Empresa / CNPJ</th>
+                    <th>Sistema</th>
+                    <th>Status</th>
+                    <th>Fechamento Fiscal</th>
+                    <th>Avisos Críticos</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in empresas %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('empresas.detalhes', id=emp.id) }}" class="fw-bold text-decoration-none">{{ emp.nome_razao_social }}</a><br>
+                        <small class="text-muted">{{ emp.cnpj }}</small>
+                    </td>
+                    <td><span class="badge bg-secondary">{{ emp.sistema_principal }}</span></td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if emp.status == 'Ativo' else ('danger' if emp.status == 'Inadimplente' else 'secondary') }}">
+                            {{ emp.status }}
+                        </span>
+                    </td>
+                    <td>Dia {{ emp.dia_fechamento_fiscal or '-' }}</td>
+                    <td>
+                        {% if emp.avisos_criticos %}
+                            <span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> {{ emp.avisos_criticos }}</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('empresas.detalhes', id=emp.id) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i></a>
+                        <a href="{{ url_for('empresas.editar', id=emp.id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Nenhuma empresa encontrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4">
+    <h3>{{ 'Editar' if procedimento else 'Novo' }} Procedimento na Base de Conhecimento</h3>
+    <form method="POST" enctype="multipart/form-data" class="mt-3">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label">Título do Erro / Rotina *</label>
+                <input type="text" name="titulo" class="form-control" required value="{{ procedimento.titulo if procedimento else '' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Sistema Relacionado *</label>
+                <select name="sistema_relacionado" class="form-select" required>
+                    <option value="TK2000" {% if procedimento and procedimento.sistema_relacionado == 'TK2000' %}selected{% endif %}>TK2000</option>
+                    <option value="Pallas" {% if procedimento and procedimento.sistema_relacionado == 'Pallas' %}selected{% endif %}>Pallas</option>
+                    <option value="GenPack" {% if procedimento and procedimento.sistema_relacionado == 'GenPack' %}selected{% endif %}>GenPack</option>
+                    <option value="ControlID" {% if procedimento and procedimento.sistema_relacionado == 'ControlID' %}selected{% endif %}>ControlID</option>
+                    <option value="Geral" {% if procedimento and procedimento.sistema_relacionado == 'Geral' %}selected{% endif %}>Geral</option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Tags / Palavras-chave de Busca (separadas por vírgula)</label>
+                <input type="text" name="tags" class="form-control" placeholder="ex: rejeicao 217, sefaz, certificado, spooler" value="{{ procedimento.tags if procedimento else '' }}">
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Solução Técnica Passo a Passo *</label>
+                <textarea name="solucao_passo_a_passo" class="form-control" rows="5" required>{{ procedimento.solucao_passo_a_passo if procedimento else '' }}</textarea>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Script de Resposta Padrão para WhatsApp do Cliente</label>
+                <textarea name="script_whatsapp" class="form-control" rows="3" placeholder="Mensagem pronta para enviar ao cliente explicando o procedimento...">{{ procedimento.script_whatsapp if procedimento else '' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Anexo (Print do Erro Original / Manual)</label>
+                <input type="file" name="anexo_file" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Links Úteis (URLs de apoio)</label>
+                <input type="text" name="links_uteis" class="form-control" value="{{ procedimento.links_uteis if procedimento else '' }}">
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Observações Internas</label>
+                <input type="text" name="observacoes" class="form-control" value="{{ procedimento.observacoes if procedimento else '' }}">
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Salvar Procedimento</button>
+            <a href="{{ url_for('procedimentos.listar') }}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

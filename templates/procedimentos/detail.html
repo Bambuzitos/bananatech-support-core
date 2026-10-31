@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ procedimento.titulo }}</h2>
+    <div>
+        <a href="{{ url_for('procedimentos.editar', id=procedimento.id) }}" class="btn btn-warning"><i class="bi bi-pencil"></i> Editar</a>
+        <form action="{{ url_for('procedimentos.deletar', id=procedimento.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Remover procedimento?');">
+            <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+        </form>
+    </div>
+</div>
+
+<div class="card p-4 mb-4">
+    <div class="mb-3">
+        <span class="badge bg-secondary fs-6">{{ procedimento.sistema_relacionado }}</span>
+        {% if procedimento.tags %}
+            {% for tag in procedimento.tags.split(',') %}
+                <span class="badge bg-light text-dark fs-6">#{{ tag.strip() }}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <h5>Solução Técnica Passo a Passo</h5>
+    <div class="p-3 bg-light rounded mb-4 style-pre" style="white-space: pre-wrap;">{{ procedimento.solucao_passo_a_passo }}</div>
+
+    {% if procedimento.script_whatsapp %}
+    <div class="card border-success mb-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-whatsapp"></i> Script de Resposta Padrão para WhatsApp</span>
+            <button class="btn btn-sm btn-light" onclick="copiarTexto('scriptWhatsappText')"><i class="bi bi-clipboard"></i> Copiar Texto</button>
+        </div>
+        <div class="card-body bg-light">
+            <p id="scriptWhatsappText" class="card-text" style="white-space: pre-wrap;">{{ procedimento.script_whatsapp }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if procedimento.links_uteis %}
+    <p><strong>Links Úteis:</strong> <a href="{{ procedimento.links_uteis }}" target="_blank">{{ procedimento.links_uteis }}</a></p>
+    {% endif %}
+
+    {% if procedimento.anexo_path %}
+    <p><strong>Anexo:</strong> <a href="{{ url_for('uploaded_file', filename=procedimento.anexo_path) }}" target="_blank" class="btn btn-sm btn-outline-info"><i class="bi bi-paperclip"></i> Ver Anexo</a></p>
+    {% endif %}
+</div>
+{% endblock %}

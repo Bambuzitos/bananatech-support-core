@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Base de Conhecimento / Procedimentos</h2>
+    <a href="{{ url_for('procedimentos.criar') }}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Novo Procedimento</a>
+</div>
+
+<form method="GET" class="row g-2 mb-4">
+    <div class="col-md-6">
+        <input type="text" name="q" class="form-control" placeholder="Buscar por título, palavra-chave ou erro..." value="{{ busca }}">
+    </div>
+    <div class="col-md-4">
+        <select name="sistema" class="form-select">
+            <option value="">Todos os Sistemas</option>
+            <option value="TK2000" {% if sistema_filter == 'TK2000' %}selected{% endif %}>TK2000</option>
+            <option value="Pallas" {% if sistema_filter == 'Pallas' %}selected{% endif %}>Pallas</option>
+            <option value="GenPack" {% if sistema_filter == 'GenPack' %}selected{% endif %}>GenPack</option>
+            <option value="ControlID" {% if sistema_filter == 'ControlID' %}selected{% endif %}>ControlID</option>
+            <option value="Geral" {% if sistema_filter == 'Geral' %}selected{% endif %}>Geral</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-secondary w-100"><i class="bi bi-search"></i> Buscar</button>
+    </div>
+</form>
+
+<div class="row g-3">
+    {% for proc in procedimentos %}
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="d-flex justify-content-between align-items-start">
+                <h5 class="card-title text-primary"><a href="{{ url_for('procedimentos.detalhes', id=proc.id) }}" class="text-decoration-none">{{ proc.titulo }}</a></h5>
+                <span class="badge bg-secondary">{{ proc.sistema_relacionado }}</span>
+            </div>
+            <p class="card-text text-muted mt-2">{{ proc.solucao_passo_a_passo|truncate(120) }}</p>
+            {% if proc.tags %}
+                <div class="mb-2">
+                    {% for tag in proc.tags.split(',') %}
+                        <span class="badge bg-light text-dark">#{{ tag.strip() }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="mt-auto pt-2">
+                <a href="{{ url_for('procedimentos.detalhes', id=proc.id) }}" class="btn btn-sm btn-outline-primary">Ver Solução Completa</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-md-12"><p class="text-center text-muted">Nenhum procedimento encontrado.</p></div>
+    {% endfor %}
+</div>
+{% endblock %}

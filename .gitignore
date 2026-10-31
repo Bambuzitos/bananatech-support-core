@@ -1,0 +1,27 @@
+# Ambiente Virtual
+venv/
+ENV/
+env/
+
+# Banco de Dados Local (SQLite)
+instance/*.db
+*.db
+*.sqlite3
+
+# Pastas de Uploads e Arquivos Temporários
+uploads/*
+!uploads/.gitkeep
+temp_restore.zip
+backup_bananatech.zip
+*.log
+
+# Variáveis de Ambiente e Segredos
+.env
+.env.local
+
+# Cache de Python e IDEs
+__pycache__/
+*.py[cod]
+.vscode/
+.idea/
+.DS_Store

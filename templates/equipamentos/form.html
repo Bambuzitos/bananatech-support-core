@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4">
+    <h3>{{ 'Editar' if equipamento else 'Adicionar' }} Equipamento - {{ empresa.nome_razao_social }}</h3>
+    <form method="POST" enctype="multipart/form-data" class="mt-3">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Tipo de Equipamento *</label>
+                <select name="tipo" class="form-select" required>
+                    <option value="Caixa" {% if equipamento and equipamento.tipo == 'Caixa' %}selected{% endif %}>Caixa</option>
+                    <option value="Servidor" {% if equipamento and equipamento.tipo == 'Servidor' %}selected{% endif %}>Servidor</option>
+                    <option value="Impressora" {% if equipamento and equipamento.tipo == 'Impressora' %}selected{% endif %}>Impressora</option>
+                    <option value="Balança" {% if equipamento and equipamento.tipo == 'Balança' %}selected{% endif %}>Balança</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Identificação (ex: Caixa 01, Impressora Balcão) *</label>
+                <input type="text" name="identificacao" class="form-control" required value="{{ equipamento.identificacao if equipamento else '' }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">ID de Acesso Remoto (AnyDesk / TeamViewer)</label>
+                <input type="text" name="acesso_remoto_id" class="form-control" value="{{ equipamento.acesso_remoto_id if equipamento else '' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Senha de Acesso Remoto</label>
+                <input type="text" name="acesso_remoto_senha" class="form-control" value="{{ equipamento.acesso_remoto_senha if equipamento else '' }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">URL de Drivers / Repositório</label>
+                <input type="url" name="url_drivers" class="form-control" placeholder="https://..." value="{{ equipamento.url_drivers if equipamento else '' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Anexo de Manual / Arquivo Técnico</label>
+                <input type="file" name="anexo_file" class="form-control">
+                {% if equipamento and equipamento.anexo_path %}
+                    <small class="text-muted">Anexo atual: <a href="{{ url_for('uploaded_file', filename=equipamento.anexo_path) }}" target="_blank">Ver Arquivo</a></small>
+                {% endif %}
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Observações Técnicas</label>
+                <textarea name="observacoes_tecnicas" class="form-control" rows="3">{{ equipamento.observacoes_tecnicas if equipamento else '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Salvar Equipamento</button>
+            <a href="{{ url_for('empresas.detalhes', id=empresa.id) }}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

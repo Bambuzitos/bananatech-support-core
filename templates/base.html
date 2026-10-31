@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BananaTech - Suporte & Gestão de Clientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-brand { font-weight: bold; color: #ffc107 !important; }
+        .card { border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .alert-critico { background-color: #f8d7da; border-left: 6px solid #dc3545; color: #842029; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}"><i class="bi bi-shop-window"></i> BananaTech</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('empresas.listar') }}"><i class="bi bi-building"></i> Empresas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('tickets.listar') }}"><i class="bi bi-headset"></i> Tickets / Suporte</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('procedimentos.listar') }}"><i class="bi bi-book"></i> Base de Conhecimento</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('backup.index') }}"><i class="bi bi-hdd-network"></i> Backup & Restauração</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function copiarTexto(elementId) {
+            var text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Script copiado para a área de transferência!');
+            });
+        }
+    </script>
+</body>
+</html>
