@@ -24,13 +24,13 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('empresas.listar') }}"><i class="bi bi-building"></i> Empresas</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('tickets.listar') }}"><i class="bi bi-headset"></i> Tickets / Suporte</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('envios_fiscais.listar') }}"><i class="bi bi-file-earmark-check"></i> Envios Fiscais</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('procedimentos.listar') }}"><i class="bi bi-book"></i> Base de Conhecimento</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('backup.index') }}"><i class="bi bi-hdd-network"></i> Backup & Restauração</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-
     <div class="container pb-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -42,7 +42,6 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-
         {% block content %}{% endblock %}
     </div>
 

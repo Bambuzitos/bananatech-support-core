@@ -1,7 +1,10 @@
 import os
+
 from flask import Flask, send_from_directory
+
 from config import Config
 from models import db
+
 from routes.main import main_bp
 from routes.empresas import empresas_bp
 from routes.equipamentos import equipamentos_bp
@@ -9,6 +12,8 @@ from routes.contatos import contatos_bp
 from routes.tickets import tickets_bp
 from routes.procedimentos import procedimentos_bp
 from routes.backup import backup_bp
+from routes.envios_fiscais import envios_fiscais_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -26,6 +31,7 @@ def create_app():
     app.register_blueprint(tickets_bp)
     app.register_blueprint(procedimentos_bp)
     app.register_blueprint(backup_bp)
+    app.register_blueprint(envios_fiscais_bp)
 
     @app.route('/uploads/<path:filename>')
     def uploaded_file(filename):
@@ -35,6 +41,7 @@ def create_app():
         db.create_all()
 
     return app
+
 
 if __name__ == '__main__':
     app = create_app()
