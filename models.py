@@ -3,6 +3,7 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
+
 class Empresa(db.Model):
     __tablename__ = 'empresas'
 
@@ -57,7 +58,6 @@ class Contato(db.Model):
     funcao = db.Column(db.String(50), nullable=False)  # Dono, Operador, Contador
     recebe_arquivo_fiscal = db.Column(db.Boolean, default=False)
     observacoes = db.Column(db.Text, nullable=True)
-
     tickets = db.relationship('Ticket', backref='contato', lazy=True)
 
 
@@ -73,7 +73,6 @@ class Procedimento(db.Model):
     anexo_path = db.Column(db.String(255), nullable=True)
     links_uteis = db.Column(db.Text, nullable=True)
     observacoes = db.Column(db.Text, nullable=True)
-
     tickets = db.relationship('Ticket', backref='procedimento', lazy=True)
 
 
@@ -92,3 +91,25 @@ class Ticket(db.Model):
     anexo_path = db.Column(db.String(255), nullable=True)
     status = db.Column(db.String(20), nullable=False, default='Aberto')  # Aberto, Pendente, Resolvido
     observacoes = db.Column(db.Text, nullable=True)
+
+
+class EnvioFiscal(db.Model):
+    """Registra o envio dos arquivos fiscais de uma empresa em cada competência."""
+    __tablename__ = 'envios_fiscais'
+    __table_args__ = (
+        db.UniqueConstraint(
+            'empresa_id', 'competencia',
+            name='uq_envio_fiscal_empresa_competencia'
+        ),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresas.id'), nullable=False)
+    competencia = db.Column(db.String(7), nullable=False)  # Formato: AAAA-MM
+    enviado = db.Column(db.Boolean, nullable=False, default=False)
+    data_envio = db.Column(db.DateTime, nullable=True)
+
+    empresa = db.relationship(
+        'Empresa',
+        backref=db.backref('envios_fiscais', cascade='all, delete-orphan', lazy=True)
+    )

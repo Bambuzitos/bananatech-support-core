@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1"><i class="bi bi-file-earmark-check"></i> Envios Fiscais</h2>
+        <p class="text-muted mb-0">Controle mensal de envio dos arquivos fiscais das empresas.</p>
+    </div>
+    <span class="badge text-bg-primary fs-6">Competência {{ competencia[5:7] }}/{{ competencia[:4] }}</span>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 p-3 h-100">
+            <div class="text-muted small">Total de empresas</div>
+            <div class="fs-2 fw-bold">{{ total_empresas }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 p-3 h-100">
+            <div class="text-muted small">Arquivos enviados</div>
+            <div class="fs-2 fw-bold text-success">{{ total_enviados }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 p-3 h-100">
+            <div class="text-muted small">Pendentes</div>
+            <div class="fs-2 fw-bold text-danger">{{ total_pendentes }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 p-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-semibold">Progresso dos envios</span>
+        <span class="fw-semibold">{{ percentual }}%</span>
+    </div>
+    <div class="progress" role="progressbar" aria-label="Progresso dos envios fiscais" aria-valuenow="{{ percentual }}" aria-valuemin="0" aria-valuemax="100" style="height: 12px;">
+        <div class="progress-bar bg-success" style="width: {{ percentual }}%"></div>
+    </div>
+</div>
+
+<form method="GET" class="card border-0 p-3 mb-4">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label for="competencia" class="form-label">Mês de referência</label>
+            <input type="month" class="form-control" id="competencia" name="competencia" value="{{ competencia }}">
+        </div>
+        <div class="col-md-4">
+            <label for="q" class="form-label">Buscar empresa</label>
+            <input type="text" class="form-control" id="q" name="q" placeholder="Razão social ou CNPJ" value="{{ busca }}">
+        </div>
+        <div class="col-md-3">
+            <label for="filtro" class="form-label">Situação do envio</label>
+            <select class="form-select" id="filtro" name="filtro">
+                <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todas</option>
+                <option value="pendente" {% if filtro == 'pendente' %}selected{% endif %}>Pendentes</option>
+                <option value="enviado" {% if filtro == 'enviado' %}selected{% endif %}>Enviados</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Filtrar</button>
+        </div>
+    </div>
+    <div class="mt-2">
+        <a href="{{ url_for('envios_fiscais.listar') }}" class="small text-decoration-none">Voltar para o mês atual e limpar filtros</a>
+    </div>
+</form>
+
+<div class="card border-0 p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Empresas</h5>
+        <span class="text-muted small">{{ empresas|length }} empresa(s) na lista</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Empresa / CNPJ</th>
+                    <th>Status da empresa</th>
+                    <th>Envio {{ competencia[5:7] }}/{{ competencia[:4] }}</th>
+                    <th>Data do envio</th>
+                    <th class="text-end">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empresa in empresas %}
+                {% set registro = envios_por_empresa.get(empresa.id) %}
+                {% set foi_enviado = registro and registro.enviado %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('empresas.detalhes', id=empresa.id) }}" class="fw-bold text-decoration-none">{{ empresa.nome_razao_social }}</a><br>
+                        <small class="text-muted">{{ empresa.cnpj }}</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if empresa.status == 'Ativo' else ('danger' if empresa.status == 'Inadimplente' else 'secondary') }}">{{ empresa.status }}</span>
+                    </td>
+                    <td>
+                        {% if foi_enviado %}
+                            <span class="badge text-bg-success"><i class="bi bi-check-circle"></i> Enviado</span>
+                        {% else %}
+                            <span class="badge text-bg-danger"><i class="bi bi-clock-history"></i> Pendente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if foi_enviado and registro.data_envio %}
+                            {{ registro.data_envio.strftime('%d/%m/%Y às %H:%M') }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if foi_enviado %}
+                            <form method="POST" action="{{ url_for('envios_fiscais.atualizar_envio', empresa_id=empresa.id, acao='desmarcar') }}" class="d-inline">
+                                <input type="hidden" name="competencia" value="{{ competencia }}">
+                                <input type="hidden" name="q" value="{{ busca }}">
+                                <input type="hidden" name="filtro" value="{{ filtro }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-arrow-counterclockwise"></i> Desmarcar</button>
+                            </form>
+                        {% else %}
+                            <form method="POST" action="{{ url_for('envios_fiscais.atualizar_envio', empresa_id=empresa.id, acao='marcar') }}" class="d-inline">
+                                <input type="hidden" name="competencia" value="{{ competencia }}">
+                                <input type="hidden" name="q" value="{{ busca }}">
+                                <input type="hidden" name="filtro" value="{{ filtro }}">
+                                <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Marcar como enviado</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">Nenhuma empresa encontrada com os filtros selecionados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="alert alert-info mt-3 mb-0" role="alert">
+    <i class="bi bi-info-circle"></i>
+    <strong>Controle automático por mês:</strong> ao mudar a competência, todas as empresas sem registro naquele mês aparecem como pendentes. Os envios dos meses anteriores ficam salvos no histórico.
+</div>
+{% endblock %}
